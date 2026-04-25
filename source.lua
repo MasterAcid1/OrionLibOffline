@@ -1,19 +1,22 @@
-
-
 local UserInputService = game:GetService("UserInputService")
 local TweenService = game:GetService("TweenService")
 local RunService = game:GetService("RunService")
 local LocalPlayer = game:GetService("Players").LocalPlayer
 local Mouse = LocalPlayer:GetMouse()
 local HttpService = game:GetService("HttpService")
--- Disable all outbound HTTP requests (safety lock)
-local function DisabledHTTP()
-	warn("Blocked HTTP request (offline safe version)")
-	return nil
-end
 
-game.HttpGet = DisabledHTTP
-game.HttpGetAsync = DisabledHTTP
+local originalHttpGet = game.HttpGet
+local originalHttpGetAsync = game.HttpGetAsync
+
+
+task.defer(function()
+	game.HttpGet = function()
+		warn("Blocked HTTP request (offline safe version)")
+		return nil
+	end
+	game.HttpGetAsync = game.HttpGet
+end)
+
 -- Disable file system 
 local function writefile() end
 local function readfile() return nil end
